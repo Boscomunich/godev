@@ -1,34 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {BrowserRouter, Routes, Route } from 'react-router-dom'
+import HomePage from './pages/Homepage'
+import createStore from 'react-auth-kit/createStore';
+import AuthProvider from 'react-auth-kit/AuthProvider';
+import Dashboard from './pages/Dashboard';
+import AuthOutlet from '@auth-kit/react-router/AuthOutlet'
+import Main from './components/Main';
+import CodingPage from './pages/CodingPage';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const store = createStore({
+  authName:'_auth',
+  authType:'cookie',
+  cookieDomain: window.location.hostname,
+  cookieSecure: window.location.protocol === 'http:',
+});
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <AuthProvider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<HomePage/>}/>
+          <Route element={<AuthOutlet fallbackPath='/' />}>
+            <Route path='/dashboard' element={<Dashboard/>}>
+              <Route index element={<Main/>}/>
+              <Route path='/dashboard/:project' element={<CodingPage/>}/>
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 
