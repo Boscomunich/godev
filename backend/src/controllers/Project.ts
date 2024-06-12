@@ -43,9 +43,7 @@ export const getAllProject = tryCatch(async (req: Request, res: Response) => {
 })
 
 export const deleteProject = tryCatch(async (req: Request, res: Response) => {
-    const { id, name } = req.body
-    const { userId } = req.user
-    const folder = name + userId
+    const { id } = req.body
     await prisma.projects.delete({
         where: {
             id: id

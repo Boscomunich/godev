@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import { tryCatch } from '../TryCatch';
 import crypto from 'crypto'
 import { compare } from 'bcryptjs';
-import jwt from 'jsonwebtoken'
 import { encryptPassWord, createJWT } from '../utils/Utils'
 
 const prisma = new PrismaClient()

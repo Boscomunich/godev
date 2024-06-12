@@ -15,12 +15,3 @@ export function createJWT (id: string, email: string) {
         {expiresIn: '30d'}
     )
 }
-
-//create short term jwt token
-export function createShortJWT (id: string, email: string) {
-    return jwt.sign(
-        {userId: id, name: email},
-        process.env.JWT_SECRET as string,
-        {expiresIn: '1d'}
-    )
-}

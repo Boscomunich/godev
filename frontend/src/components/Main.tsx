@@ -96,7 +96,7 @@ const Main = () => {
         })
         const res = await response.json()
         if (response.ok) {
-            setProject(res)
+            setProject(res.slice(-3))
         }
     }
 
@@ -140,10 +140,10 @@ const Main = () => {
                 <p className='font-bold text-xl'>
                     Recent Project
                 </p>
-                <div>
+                <div className='flex'>
                     {   projects?.length < 1 ?
                         <Empty description={false} />:
-                        <div>
+                        <div className='flex'>
                         {
                             projects?.map((project: ProjectsType, index: number) => (
                             <ProjectCard

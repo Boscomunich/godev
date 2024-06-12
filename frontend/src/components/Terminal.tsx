@@ -12,13 +12,15 @@ function ab2str(buf: ArrayBuffer): string {
 export const TerminalComponent = ({ socket }: {socket: Socket | null}) => {
     const terminalRef = useRef<HTMLDivElement | null>(null);
 
-    const [isdark, setIsDark] = useState('')
+    const [isdark, setIsDark] = useState('black')
 
     const OPTIONS_TERM = {
         useStyle: true,
         screenKeys: true,
         cursorBlink: true,
-        cols: 200,
+        cols: 80,
+        fontSize: 12,
+        scrollToButtom: true,
         theme: {
             background: isdark
         }
@@ -68,8 +70,9 @@ export const TerminalComponent = ({ socket }: {socket: Socket | null}) => {
     }, [terminalRef]);
 
     return ( 
-        <div className="w-[40vw] h-[400px] text-left" 
+        <div className="relative overflow-auto scrollbar-thin w-full h-[88vh] dark:text-black"
         ref={terminalRef}>
-        </div>
+        
+    </div>
     )
 }

@@ -1,11 +1,11 @@
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import path from "path";
-import { deleteDir, deleteFile, fetchDir, fetchFileContent, saveFile } from "../utils/fs";
+import { createFolder,  deleteFile, fetchDir, fetchFileContent, saveFile } from "../utils/fs";
 import { allowedOrigins } from "../..";
 import { ioAuth } from "../middleware/Auth";
 import { TerminalManager } from "../Terminal";
-import { deleteFromS3, fetchS3Folder, saveToS3 } from "../Cloud";
+import { deleteFromS3, fetchS3Folder, saveProjectToS3 } from "../Cloud";
 import { PrismaClient } from '@prisma/client'
 import { throttledSaveToS3 } from "../utils/Throttle";
 
@@ -28,6 +28,7 @@ export function initWs(httpServer: HttpServer) {
             return;
         }
         console.log('connected')
+        //get project
         const project = await prisma.projects.findFirst({
             where: {
                 name: name as string
@@ -35,9 +36,10 @@ export function initWs(httpServer: HttpServer) {
         })
         const folder = project?.folder
         const projectName = project?.name
-        await fetchS3Folder(`projects/${folder}`, path.join(__dirname, `../tmp/${projectName}`));
+        await createFolder(path.join(__dirname, `../../../tmp/${projectName}`))
+        await fetchS3Folder(`projects/${folder}`, path.join(__dirname, `../../../tmp/${projectName}`));
         socket.emit("loaded", {
-            rootContent: await fetchDir(path.join(__dirname, `../tmp/${projectName}`), "")
+            rootContent: await fetchDir(path.join(__dirname, `../../../tmp/${projectName}`), "")
         });
 
         initHandlers(socket, projectName as string, folder as string);
@@ -47,32 +49,33 @@ export function initWs(httpServer: HttpServer) {
 function initHandlers(socket: Socket, projectName: string, folder: string ) {
 
     socket.on("disconnect", async () => {
-        deleteDir(`../tmp/${projectName}`)
+        terminalManager.clear(socket.id)
+        await saveProjectToS3(path.join(__dirname, `../../../tmp/${projectName}`), `projects/${folder}`)
+        console.log('client disconnected')
     });
 
     socket.on("fetchDir", async (dir: string, callback) => {
-        const dirPath = path.join(__dirname, `../tmp/${projectName}/${dir}`);
+        const dirPath = path.join(__dirname, `../../../tmp/${projectName}/${dir}`);
         const contents = await fetchDir(dirPath, dir);
         callback(contents);
     });
 
     socket.on("fetchContent", async ({ path: filePath }: { path: string }, callback) => {
-        const fullPath = path.join(__dirname, `../tmp/${projectName}/${filePath}`);
+        const fullPath = path.join(__dirname, `../../../tmp/${projectName}/${filePath}`);
         const data = await fetchFileContent(fullPath);
         callback(data);
     });
 
     // TODO: contents should be diff, not full file
-    // Should be validated for size
-    // Should be throttled before updating S3 (or use an S3 mount)
     socket.on("updateContent", async ({ path: filePath, content }: { path: string, content: string }) => {
-        const fullPath = path.join(__dirname, `../tmp/${projectName}/${filePath}`);
+        const fullPath = path.join(__dirname, `../../../tmp/${projectName}/${filePath}`);
+        console.log(fullPath, content)
         await saveFile(fullPath, content);
         await throttledSaveToS3(`projects/${folder}`, filePath, content);
     });
 
     socket.on("deleteFile", async ({ path: filePath }: { path: string }) => {
-        const fullPath = path.join(__dirname, `../tmp/${projectName}/${filePath}`);
+        const fullPath = path.join(__dirname, `../../../tmp/${projectName}/${filePath}`);
         await deleteFile(fullPath );
         await deleteFromS3(`projects/${folder}`, filePath);
     });

@@ -4,6 +4,7 @@ import {SiHtml5, SiCss3, SiJavascript, SiTypescript, SiJson} from "react-icons/s
 import {FcFolder, FcOpenedFolder, FcPicture, FcFile} from "react-icons/fc";
 import {AiFillFileText} from "react-icons/ai";
 
+//set icon for file type
 function getIconHelper() {
     const cache = new Map<string, ReactNode>();
     cache.set("js", <SiJavascript color="#fbcb38"/>);

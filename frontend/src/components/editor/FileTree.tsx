@@ -2,12 +2,14 @@ import React, {useState} from 'react'
 import {Directory, File, sortDir, sortFile} from "./utils/FileManager";
 import {getIcon} from "./Icon";
 
+
 interface FileTreeProps {
     rootDir: Directory; 
     selectedFile: File | undefined;
     onSelect: (file: File) => void;
 }
 
+//renders subtree component with root directory
 export const FileTree = (props: FileTreeProps) => {
     return <SubTree directory={props.rootDir} {...props}/>
 }
@@ -18,9 +20,13 @@ interface SubTreeProps {
     onSelect: (file: File) => void;
 }
 
+// The SubTree component, which displays the contents of a directory
 const SubTree = (props: SubTreeProps) => {
+    // The component renders a list of directories and files, each represented by a DirDiv or FileDiv component
+    // Directories and files are sorted using the sortDir and sortFile functions
+    // When a file is clicked, the onSelect function is called with the file as an argument
     return (
-        <div>
+        <div className='dark:bg-primary dark:text-white h-[88vh] relative overflow-auto scrollbar-thin w-full'>
         {
             props.directory.dirs
             .sort(sortDir)
@@ -41,7 +47,8 @@ const SubTree = (props: SubTreeProps) => {
                 <FileDiv
                     file={file}
                     selectedFile={props.selectedFile}
-                    onClick={() => props.onSelect(file)}/>
+                    onClick={() => props.onSelect(file)}
+                    />
                 </React.Fragment>
             ))
         }
@@ -53,14 +60,15 @@ const SubTree = (props: SubTreeProps) => {
     file: File | Directory;
     icon?: string;
     selectedFile: File | undefined; 
-    onClick: () => void; 
+    onClick: () => void;
     }) => {
     const isSelected = (selectedFile && selectedFile.id === file.id) as boolean;
     const depth = file.depth;
     return (
         <div
-        className={`flex items-center pl-[${depth * 16}px] bg-${isSelected ? "[#242424]": "transparent"} hover:cursor-pointer hover:bg-[ #242424;]`}
-        onClick={onClick}>
+        className={`flex items-center pl-${depth} ${isSelected ? "bg-[#242424]": "transparent"} hover:cursor-pointer hover:bg-[#242424]`}
+        onClick={onClick}
+        >
         <FileIcon
             name={icon}
             extension={file.name.split('.').pop() || ""}/>
@@ -91,20 +99,26 @@ const DirDiv = ({directory, selectedFile, onSelect}: {
                 onSelect(directory)
             }
             setOpen(!open)
-            }}/>
+            }}
+            />
         {
             open ? (
             <SubTree
                 directory={directory}
                 selectedFile={selectedFile}
-                onSelect={onSelect}/>
+                onSelect={onSelect}
+                />
             ) : null
         }
         </>
     )
 }
 
+// A helper function to check if a file is a child of a directory
 const isChildSelected = (directory: Directory, selectedFile: File) => {
+    // The function checks if the selected file is a child of the directory
+    // It returns true if the selected file is a child of the directory, and false otherwise
+
     let res: boolean = false;
 
     function isChild(dir: Directory, file: File) {
@@ -125,6 +139,7 @@ const isChildSelected = (directory: Directory, selectedFile: File) => {
     return res;
 }
 
+// The FileIcon component, which displays an icon for a file
 const FileIcon = ({extension, name}: { name?: string, extension?: string }) => {
     let icon = getIcon(extension || "", name || "");
     return (

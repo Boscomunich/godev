@@ -12,7 +12,7 @@ type EditorProps = {
     socket: Socket | null;
 }
 // credits - https://codesandbox.io/s/monaco-tree-pec7u
-export const Editor = ({ files, onSelect, selectedFile, socket }: EditorProps) => {
+export const Editor = ({ files, onSelect, selectedFile, socket}: EditorProps) => {
     const rootDir = useMemo(() => {
         return buildFileTree(files);
     }, [files]);

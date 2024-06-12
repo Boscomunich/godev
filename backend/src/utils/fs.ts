@@ -32,9 +32,7 @@ export const fetchFileContent = (file: string): Promise<string> => {
 
 export function writeFile(filePath: string, fileData: string): Promise<void> {
     return new Promise(async (resolve, reject) => {
-        await createFolder(path.dirname(filePath));
-
-        fs.writeFile(filePath, fileData, "utf8", (err) => {
+            fs.writeFile(filePath, fileData, (err) => {
             if (err) {
                 reject(err)
             } else {
@@ -44,20 +42,20 @@ export function writeFile(filePath: string, fileData: string): Promise<void> {
     });
 }
 
-function createFolder(dirName: string) {
-    return new Promise<void>((resolve, reject) => {
+export function createFolder(dirName: string) {
+    return new Promise<string>((resolve, reject) => {
         fs.mkdir(dirName, { recursive: true }, (err) => {
             if (err) {
                 return reject(err)
             }
-            resolve()
+            return resolve('success')
         });
     })
 }
 
 export const saveFile = async (file: string, content: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-        fs.writeFile(file, content, "utf8", (err) => {
+        fs.writeFile(file, content, (err) => {
             if (err) {
                 return reject(err);
             }
@@ -81,9 +79,9 @@ export const deleteDir = async (path: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         fs.rm(path, {recursive: true, force: true}, (err) => {
             if (err) {
-                return reject(err);
+                return console.log(err);
             }
-            resolve();
+        console.log('success')
         });
     });
 }

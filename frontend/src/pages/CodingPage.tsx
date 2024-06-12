@@ -37,7 +37,6 @@ const CodingPage = () => {
     const socket = useSocket(name, authHeader as string);
     const [fileStructure, setFileStructure] = useState<RemoteFile[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
-    const [showOutput, setShowOutput] = useState(false);
 
 
     useEffect(() => {
@@ -73,16 +72,13 @@ const CodingPage = () => {
     }
 
     return (
-        <div className='flex flex-col w-[100%]'>
-            <div className='flex justify-center p-5'>
-                <button onClick={() => setShowOutput(!showOutput)}>See output</button>
-            </div>
-            <div className='flex m-0 text-[16px] w-[100%]'>
-                <div className='flex-1 w-[60%]'>
-                    <Editor socket={socket} selectedFile={selectedFile} onSelect={onSelect} files={fileStructure} />
+        <div className='flex flex-col w-[100vw] dark:bg-primary fixed top-[40px] dark:text-white'>
+            <div className='w-full h-[40px]'></div>
+            <div className='flex m-0 text-[16px]'>
+                <div className='w-[70%]'>
+                    <Editor socket={socket} selectedFile={selectedFile} onSelect={onSelect} files={fileStructure}/>
                 </div>
-                <div className='flex-1 w-[40%]'>
-                    {showOutput && <Output />}
+                <div className='w-[30%]'>
                     <Terminal socket={socket} />
                 </div>
             </div>

@@ -17,10 +17,17 @@ export default {
         "black-200": "#090325",
         "white-100": "#f3f3f3",
       },
+      scrollbar: theme => ({
+        thin: '1px',
+        thumb: '#888',
+        track: '#eee',
+      }),
       fontFamily: {
         inter: ['Roboto', 'sans-serif'],
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar')
+  ],
 }

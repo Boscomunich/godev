@@ -28,11 +28,15 @@ export interface Directory extends CommonProps {
     dirs: Directory[];
 }
 
+// This function takes an array of RemoteFile objects and builds a file tree from it.
 export function buildFileTree(data: RemoteFile[]): Directory {
+    // Separate directories and files from the data
     const dirs = data.filter(x => x.type === "dir");
     const files = data.filter(x => x.type === "file");
+    // Create a cache to store the directories and files by their path
     const cache = new Map<string, Directory | File>();
     
+    // Initialize the root directory
     let rootDir: Directory = {
         id: "root",
         name: "root",
@@ -43,6 +47,7 @@ export function buildFileTree(data: RemoteFile[]): Directory {
         dirs: [],
         files: []
     };
+    // For each directory in the data, create a Directory object and add it to the cache
     dirs.forEach((item) => {
         let dir: Directory = {
         id: item.path,
@@ -54,10 +59,10 @@ export function buildFileTree(data: RemoteFile[]): Directory {
         dirs: [],
         files: []
     };
-
     cache.set(dir.id, dir);
     });
 
+    // For each file in the data, create a File object and add it to the cache
     files.forEach((item) => {
         let file: File = {
         id: item.path,
@@ -70,6 +75,7 @@ export function buildFileTree(data: RemoteFile[]): Directory {
         cache.set(file.id, file);
     });
 
+    // For each item in the cache, add it to its parent directory's files or dirs array
     cache.forEach((value) => {
         if (value.parentId === "0") {
         if (value.type === Type.DIRECTORY) rootDir.dirs.push(value as Directory);
@@ -87,6 +93,7 @@ export function buildFileTree(data: RemoteFile[]): Directory {
     return rootDir;
 }
 
+// This function calculates the depth of each item in the file tree
 function getDepth(rootDir: Directory, curDepth: number) {
     rootDir.files.forEach((file) => {
         file.depth = curDepth + 1;
@@ -97,6 +104,7 @@ function getDepth(rootDir: Directory, curDepth: number) {
     });
 }
 
+// This function finds a file by name in the file tree
 export function findFileByName(
     rootDir: Directory,
     filename: string
@@ -119,10 +127,12 @@ export function findFileByName(
     return targetFile;
 }
 
+// This function sorts directories by name
 export function sortDir(l: Directory, r: Directory) {
     return l.name.localeCompare(r.name);
 }
 
+// This function sorts files by name
 export function sortFile(l: File, r: File) {
     return l.name.localeCompare(r.name);
 }
